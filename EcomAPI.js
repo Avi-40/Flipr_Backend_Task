@@ -1,6 +1,6 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 
 app.use(bodyParser.json());
 
@@ -21,10 +21,10 @@ function generateShippingDetailId() {
 }
 
 // Add a customer
-app.post('/api/customers', (req, res) => {
+app.post("/api/customers", (req, res) => {
   const { customerName, email, mobileNumber, city } = req.body;
   if (!customerName || !email || !mobileNumber || !city) {
-    return res.status(400).json({ error: 'All fields are required.' });
+    return res.status(400).json({ error: "All fields are required." });
   }
   const customer = {
     customerId: generateCustomerId(),
@@ -38,12 +38,15 @@ app.post('/api/customers', (req, res) => {
 });
 
 // Add a purchase order
-app.post('/api/purchase-orders', (req, res) => {
+app.post("/api/purchase-orders", (req, res) => {
   const { productName, quantity, pricing, mrp, customerId } = req.body;
   if (!productName || !quantity || !pricing || !mrp || !customerId) {
-    return res.status(400).json({ error: 'All fields are required.' });
+    return res.status(400).json({ error: "All fields are required." });
+  }
   if (pricing > mrp) {
-    return res.status(400).json({ error: 'Pricing cannot be greater than MRP.' });
+    return res
+      .status(400)
+      .json({ error: "Pricing cannot be greater than MRP." });
   }
   const purchaseOrder = {
     purchaseOrderId: generatePurchaseOrderId(),
@@ -58,10 +61,11 @@ app.post('/api/purchase-orders', (req, res) => {
 });
 
 // Add shipping details
-app.post('/api/shipping-details', (req, res) => {
+app.post("/api/shipping-details", (req, res) => {
   const { address, city, pincode, purchaseOrderId, customerId } = req.body;
   if (!address || !city || !pincode || !purchaseOrderId || !customerId) {
-    return res.status(400).json({ error: 'All fields are required.' });
+    return res.status(400).json({ error: "All fields are required." });
+  }
   const shippingDetail = {
     shippingDetailId: generateShippingDetailId(),
     address,
@@ -75,27 +79,35 @@ app.post('/api/shipping-details', (req, res) => {
 });
 
 // Get customers by city
-app.get('/api/customers-by-city/:city', (req, res) => {
+app.get("/api/customers-by-city/:city", (req, res) => {
   const city = req.params.city;
-  const filteredCustomers = customers.filter((customer) => customer.city === city);
+  const filteredCustomers = customers.filter(
+    (customer) => customer.city === city
+  );
   res.json(filteredCustomers);
 });
 
 // Get customers with all purchase orders
-app.get('/api/customers-with-purchase-orders', (req, res) => {
+app.get("/api/customers-with-purchase-orders", (req, res) => {
   const customersWithPurchaseOrders = customers.map((customer) => ({
     ...customer,
-    purchaseOrders: purchaseOrders.filter((po) => po.customerId === customer.customerId),
+    purchaseOrders: purchaseOrders.filter(
+      (po) => po.customerId === customer.customerId
+    ),
   }));
   res.json(customersWithPurchaseOrders);
 });
 
 // Get customers with all purchase orders and shipment details
-app.get('/api/customers-with-details', (req, res) => {
+app.get("/api/customers-with-details", (req, res) => {
   const customersWithDetails = customers.map((customer) => ({
     ...customer,
-    purchaseOrders: purchaseOrders.filter((po) => po.customerId === customer.customerId),
-    shipmentDetails: shippingDetails.filter((sd) => sd.customerId === customer.customerId),
+    purchaseOrders: purchaseOrders.filter(
+      (po) => po.customerId === customer.customerId
+    ),
+    shipmentDetails: shippingDetails.filter(
+      (sd) => sd.customerId === customer.customerId
+    ),
   }));
   res.json(customersWithDetails);
 });
